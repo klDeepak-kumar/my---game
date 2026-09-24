@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>Coin Hunter Mobile</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* GAME */
+#game {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* TOP BAR */
+#topBar {
+    width: 100%;
+    max-width: 900px;
+    min-height: 60px;
+    background: #222;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px;
+    font-size: 17px;
+    z-index: 5;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat span {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+/* GAME AREA */
+#gameArea {
+    position: relative;
+    width: min(95vw, 850px);
+    height: min(58vh, 500px);
+    min-height: 300px;
+    background: linear-gradient(#87ceeb, #dff6ff);
+    border: 4px solid white;
+    overflow: hidden;
+}
+
+/* PLAYER */
+#player {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    background: #1976d2;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 12px #1976d2;
+    z-index: 3;
+}
+
+/* COIN */
+#coin {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: gold;
+    border-radius: 50%;
+    border: 3px solid #b8860b;
+    box-shadow: 0 0 12px gold;
+    z-index: 2;
+}
+
+/* ENEMY */
+.enemy {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    background: #e53935;
+    border: 3px solid white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px red;
+    z-index: 2;
+}
+
+/* MENU */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.menuBox {
+    width: 90%;
+    max-width: 420px;
+    background: #222;
+    border: 2px solid #00e5ff;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 0 30px #00e5ff;
+}
+
+.menuBox h1 {
+    color: #00e5ff;
+    margin-bottom: 15px;
+}
+
+.menuBox p {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #00c853;
+    color: white;
+    margin-top: 15px;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* PAUSE BUTTON */
+#pauseBtn {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    z-index: 10;
+    background: #ff9800;
+    padding: 10px 14px;
+    font-size: 15px;
+}
+
+/* JOYSTICK */
+#joystick {
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 3px solid rgba(255,255,255,0.5);
+    z-index: 10;
+}
+
+#stick {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 37px;
+    top: 37px;
+    border-radius: 50%;
+    background: rgba(0,229,255,0.8);
+    border: 3px solid white;
+}
+
+/* MOBILE INFO */
+#mobileHint {
+    position: fixed;
+    bottom: 8px;
+    right: 10px;
+    font-size: 12px;
+    opacity: 0.7;
+    z-index: 5;
+}
+
+/* DESKTOP KEY INFO */
+#keyboardInfo {
+    margin-top: 8px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* PORTRAIT MOBILE */
+@media (max-width: 600px) {
+
+    #topBar {
+        min-height: 52px;
+        font-size: 13px;
+    }
+
+    #gameArea {
+        width: 96vw;
+        height: 52vh;
+        min-height: 280px;
+        border-width: 3px;
+    }
+
+    #player {
+        width: 38px;
+        height: 38px;
+    }
+
+    #coin {
+        width: 25px;
+        height: 25px;
+    }
+
+    .enemy {
+        width: 34px;
+        height: 34px;
+    }
+
+    #joystick {
+        width: 125px;
+        height: 125px;
+        bottom: 20px;
+        left: 18px;
+    }
+
+    #stick {
+        width: 55px;
+        height: 55px;
+        left: 32px;
+        top: 32px;
+    }
+
+    #pauseBtn {
+        top: 58px;
+        right: 8px;
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- TOP BAR -->
+    <div id="topBar">
+
+        <div class="stat">
+            🪙 Score:
+            <span id="score">0</span>
+        </div>
+
+        <div class="stat">
+            ❤️ Lives:
+            <span id="lives">3</span>
+        </div>
+
+        <div class="stat">
+            🏆 Level:
+            <span id="level">1</span>
+        </div>
+
+        <div class="stat">
+            ⏱️ Time:
+            <span id="timer">30</span>
+        </div>
+
+    </div>
+
+    <!-- PAUSE -->
+    <button id="pauseBtn">⏸ Pause</button>
+
+    <!-- GAME AREA -->
+    <div id="gameArea">
+
+        <div id="player"></div>
+        <div id="coin"></div>
+
+    </div>
+
+    <div id="keyboardInfo">
+        PC: Arrow Keys / WASD
+    </div>
+
+</div>
+
+
+<!-- JOYSTICK -->
+<div id="joystick">
+    <div id="stick"></div>
+</div>
+
+<div id="mobileHint">
+    🕹️ Move with joystick
+</div>
+
+
+<!-- START SCREEN -->
+<div id="startScreen" class="overlay">
+
+    <div class="menuBox">
+
+        <h1>🪙 COIN HUNTER</h1>
+
+        <p>Collect the coins and avoid the enemies!</p>
+
+        <p>🎮 5 Levels</p>
+        <p>❤️ 3 Lives</p>
+        <p>⏱️ 30 Seconds / Level</p>
+
+        <button id="startBtn">
+            ▶ START GAME
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- GAME OVER -->
+<div id="gameOverScreen" class="overlay" style="display:none;">
+
+    <div class="menuBox">
+
+        <h1 id="resultTitle">GAME OVER</h1>
+
+        <p id="resultText"></p>
+
+        <button id="restartBtn">
+            🔄 PLAY AGAIN
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- PAUSE SCREEN -->
+<div id="pauseScreen" class="overlay" style="display:none;">
+
+    <div class="menuBox">
+
+        <h1>⏸ GAME PAUSED</h1>
+
+        <button id="resumeBtn">
+            ▶ RESUME
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+const gameArea = document.getElementById("gameArea");
+
+const player = document.getElementById("player");
+const coin = document.getElementById("coin");
+
+const scoreText = document.getElementById("score");
+const livesText = document.getElementById("lives");
+const levelText = document.getElementById("level");
+const timerText = document.getElementById("timer");
+
+const startScreen = document.getElementById("startScreen");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const pauseScreen = document.getElementById("pauseScreen");
+
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+const pauseBtn = document.getElementById("pauseBtn");
+const resumeBtn = document.getElementById("resumeBtn");
+
+const resultTitle = document.getElementById("resultTitle");
+const resultText = document.getElementById("resultText");
+
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
+
+let score = 0;
+let lives = 3;
+let level = 1;
+let timeLeft = 30;
+
+let gameRunning = false;
+let paused = false;
+
+let playerX = 50;
+let playerY = 50;
+
+let coinX = 200;
+let coinY = 100;
+
+let enemies = [];
+
+let keys = {};
+
+let timerInterval = null;
+
+let invincible = false;
+
+
+/* =========================
+   SOUND
+========================= */
+
+let audioContext = null;
+
+function sound(frequency, duration) {
+
+    try {
+
+        if (!audioContext) {
+            audioContext =
+                new (window.AudioContext ||
+                     window.webkitAudioContext)();
+        }
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        oscillator.frequency.value = frequency;
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+
+        gain.gain.setValueAtTime(
+            0.1,
+            audioContext.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + duration
+        );
+
+        oscillator.stop(
+            audioContext.currentTime + duration
+        );
+
+    } catch(e) {}
+}
+
+
+/* =========================
+   RANDOM POSITION
+========================= */
+
+function randomPosition(element) {
+
+    const areaWidth = gameArea.clientWidth;
+    const areaHeight = gameArea.clientHeight;
+
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
+
+    return {
+
+        x: Math.random() *
+           (areaWidth - width),
+
+        y: Math.random() *
+           (areaHeight - height)
+
+    };
+}
+
+
+/* =========================
+   MOVE COIN
+========================= */
+
+function moveCoin() {
+
+    const pos = randomPosition(coin);
+
+    coinX = pos.x;
+    coinY = pos.y;
+
+    coin.style.left = coinX + "px";
+    coin.style.top = coinY + "px";
+}
+
+
+/* =========================
+   CREATE ENEMIES
+========================= */
+
+function createEnemies() {
+
+    enemies.forEach(enemy => {
+        enemy.element.remove();
+    });
+
+    enemies = [];
+
+    const enemyCount = level + 1;
+
+    for (let i = 0; i < enemyCount; i++) {
+
+        const enemy =
+            document.createElement("div");
+
+        enemy.className = "enemy";
+
+        gameArea.appendChild(enemy);
+
+        const pos = randomPosition(enemy);
+
+        enemy.style.left = pos.x + "px";
+        enemy.style.top = pos.y + "px";
+
+        enemies.push({
+
+            element: enemy,
+
+            x: pos.x,
+
+            y: pos.y,
+
+            dx:
+                (Math.random() > 0.5 ? 1 : -1)
+                *
+                (1 + level * 0.3),
+
+            dy:
+                (Math.random() > 0.5 ? 1 : -1)
+                *
+                (1 + level * 0.3)
+
+        });
+    }
+}
+
+
+/* =========================
+   COLLISION
+========================= */
+
+function collision(a, b) {
+
+    const r1 = a.getBoundingClientRect();
+    const r2 = b.getBoundingClientRect();
+
+    return !(
+        r1.right < r2.left ||
+        r1.left > r2.right ||
+        r1.bottom < r2.top ||
+        r1.top > r2.bottom
+    );
+}
+
+
+/* =========================
+   PLAYER MOVEMENT
+========================= */
+
+function movePlayer() {
+
+    if (!gameRunning || paused)
+        return;
+
+    const speed = 4;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (keys["ArrowUp"] || keys["w"])
+        dy -= speed;
+
+    if (keys["ArrowDown"] || keys["s"])
+        dy += speed;
+
+    if (keys["ArrowLeft"] || keys["a"])
+        dx -= speed;
+
+    if (keys["ArrowRight"] || keys["d"])
+        dx += speed;
+
+    playerX += dx;
+    playerY += dy;
+
+    const maxX =
+        gameArea.clientWidth -
+        player.offsetWidth;
+
+    const maxY =
+        gameArea.clientHeight -
+        player.offsetHeight;
+
+    playerX =
+        Math.max(0, Math.min(playerX, maxX));
+
+    playerY =
+        Math.max(0, Math.min(playerY, maxY));
+
+    player.style.left = playerX + "px";
+    player.style.top = playerY + "px";
+}
+
+
+/* =========================
+   ENEMY MOVEMENT
+========================= */
+
+function moveEnemies() {
+
+    if (!gameRunning || paused)
+        return;
+
+    enemies.forEach(enemy => {
+
+        enemy.x += enemy.dx;
+        enemy.y += enemy.dy;
+
+        const maxX =
+            gameArea.clientWidth -
+            enemy.element.offsetWidth;
+
+        const maxY =
+            gameArea.clientHeight -
+            enemy.element.offsetHeight;
+
+        if (enemy.x <= 0 ||
+            enemy.x >= maxX) {
+
+            enemy.dx *= -1;
+        }
+
+        if (enemy.y <= 0 ||
+            enemy.y >= maxY) {
+
+            enemy.dy *= -1;
+        }
+
+        enemy.element.style.left =
+            enemy.x + "px";
+
+        enemy.element.style.top =
+            enemy.y + "px";
+
+    });
+}
+
+
+/* =========================
+   CHECK COIN
+========================= */
+
+function checkCoin() {
+
+    if (!gameRunning || paused)
+        return;
+
+    if (collision(player, coin)) {
+
+        score += 10;
+
+        scoreText.textContent = score;
+
+        sound(800, 0.12);
+
+        moveCoin();
+
+    }
+}
+
+
+/* =========================
+   CHECK ENEMY
+========================= */
+
+function checkEnemies() {
+
+    if (!gameRunning || paused)
+        return;
+
+    if (invincible)
+        return;
+
+    for (const enemy of enemies) {
+
+        if (collision(player, enemy.element)) {
+
+            loseLife();
+
+            break;
+        }
+    }
+}
+
+
+/* =========================
+   LOSE LIFE
+========================= */
+
+function loseLife() {
+
+    if (invincible)
+        return;
+
+    lives--;
+
+    livesText.textContent = lives;
+
+    sound(180, 0.25);
+
+    playerX = 20;
+    playerY = 20;
+
+    player.style.left = playerX + "px";
+    player.style.top = playerY + "px";
+
+    /* Temporary protection */
+    invincible = true;
+
+    player.style.opacity = "0.4";
+
+    setTimeout(() => {
+
+        invincible = false;
+
+        player.style.opacity = "1";
+
+    }, 1200);
+
+    if (lives <= 0) {
+
+        endGame(false);
+
+    }
+}
+
+
+/* =========================
+   NEXT LEVEL
+========================= */
+
+function nextLevel() {
+
+    level++;
+
+    if (level > 5) {
+
+        endGame(true);
+
+        return;
+    }
+
+    levelText.textContent = level;
+
+    timeLeft = 30;
+
+    timerText.textContent = timeLeft;
+
+    createEnemies();
+
+    moveCoin();
+
+    sound(1000, 0.3);
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer() {
+
+    clearInterval(timerInterval);
+
+    timerInterval =
+        setInterval(() => {
+
+            if (!gameRunning || paused)
+                return;
+
+            timeLeft--;
+
+            timerText.textContent =
+                timeLeft;
+
+            if (timeLeft <= 0) {
+
+                nextLevel();
+
+            }
+
+        }, 1000);
+}
+
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function gameLoop() {
+
+    movePlayer();
+
+    moveEnemies();
+
+    checkCoin();
+
+    checkEnemies();
+
+    if (gameRunning) {
+
+        requestAnimationFrame(gameLoop);
+
+    }
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame() {
+
+    score = 0;
+    lives = 3;
+    level = 1;
+    timeLeft = 30;
+
+    gameRunning = true;
+    paused = false;
+    invincible = false;
+
+    scoreText.textContent = score;
+    livesText.textContent = lives;
+    levelText.textContent = level;
+    timerText.textContent = timeLeft;
+
+    playerX = 20;
+    playerY = 20;
+
+    player.style.left =
+        playerX + "px";
+
+    player.style.top =
+        playerY + "px";
+
+    player.style.opacity = "1";
+
+    startScreen.style.display = "none";
+    gameOverScreen.style.display = "none";
+    pauseScreen.style.display = "none";
+
+    moveCoin();
+
+    createEnemies();
+
+    startTimer();
+
+    sound(600, 0.15);
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================
+   END GAME
+========================= */
+
+function endGame(won) {
+
+    gameRunning = false;
+
+    clearInterval(timerInterval);
+
+    if (won) {
+
+        resultTitle.textContent =
+            "🏆 YOU WIN!";
+
+        resultText.textContent =
+            "Congratulations! You completed all 5 levels. Score: "
+            + score;
+
+        sound(1200, 0.5);
+
+    } else {
+
+        resultTitle.textContent =
+            "💥 GAME OVER";
+
+        resultText.textContent =
+            "Your final score is " + score;
+
+    }
+
+    gameOverScreen.style.display =
+        "flex";
+}
+
+
+/* =========================
+   PAUSE
+========================= */
+
+function pauseGame() {
+
+    if (!gameRunning)
+        return;
+
+    paused = true;
+
+    pauseScreen.style.display =
+        "flex";
+}
+
+
+function resumeGame() {
+
+    paused = false;
+
+    pauseScreen.style.display =
+        "none";
+}
+
+
+/* =========================
+   KEYBOARD
+========================= */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        keys[e.key] = true;
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    e => {
+
+        keys[e.key] = false;
+
+    }
+);
+
+
+/* =========================
+   BUTTON EVENTS
+========================= */
+
+startBtn.addEventListener(
+    "click",
+    startGame
+);
+
+restartBtn.addEventListener(
+    "click",
+    startGame
+);
+
+pauseBtn.addEventListener(
+    "click",
+    pauseGame
+);
+
+resumeBtn.addEventListener(
+    "click",
+    resumeGame
+);
+
+
+/* =========================
+   TOUCH JOYSTICK
+========================= */
+
+let joystickActive = false;
+
+let joystickX = 0;
+let joystickY = 0;
+
+
+function updateJoystick(x, y) {
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+    const centerX =
+        rect.left + rect.width / 2;
+
+    const centerY =
+        rect.top + rect.height / 2;
+
+    let dx = x - centerX;
+    let dy = y - centerY;
+
+    const maxDistance = 42;
+
+    const distance =
+        Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > maxDistance) {
+
+        dx =
+            dx / distance *
+            maxDistance;
+
+        dy =
+            dy / distance *
+            maxDistance;
+    }
+
+    stick.style.transform =
+        `translate(${dx}px, ${dy}px)`;
+
+    joystickX = dx / maxDistance;
+    joystickY = dy / maxDistance;
+
+    /* Reset keys */
+    keys["ArrowUp"] = false;
+    keys["ArrowDown"] = false;
+    keys["ArrowLeft"] = false;
+    keys["ArrowRight"] = false;
+
+    if (joystickY < -0.25)
+        keys["ArrowUp"] = true;
+
+    if (joystickY > 0.25)
+        keys["ArrowDown"] = true;
+
+    if (joystickX < -0.25)
+        keys["ArrowLeft"] = true;
+
+    if (joystickX > 0.25)
+        keys["ArrowRight"] = true;
+}
+
+
+function stopJoystick() {
+
+    joystickActive = false;
+
+    stick.style.transform =
+        "translate(0, 0)";
+
+    keys["ArrowUp"] = false;
+    keys["ArrowDown"] = false;
+    keys["ArrowLeft"] = false;
+    keys["ArrowRight"] = false;
+
+}
+
+
+joystick.addEventListener(
+    "pointerdown",
+    e => {
+
+        joystickActive = true;
+
+        joystick.setPointerCapture(
+            e.pointerId
+        );
+
+        updateJoystick(
+            e.clientX,
+            e.clientY
+        );
+
+    }
+);
+
+
+joystick.addEventListener(
+    "pointermove",
+    e => {
+
+        if (!joystickActive)
+            return;
+
+        updateJoystick(
+            e.clientX,
+            e.clientY
+        );
+
+    }
+);
+
+
+joystick.addEventListener(
+    "pointerup",
+    stopJoystick
+);
+
+
+joystick.addEventListener(
+    "pointercancel",
+    stopJoystick
+);
+
+
+/* =========================
+   PREVENT MOBILE SCROLL
+========================= */
+
+document.addEventListener(
+    "touchmove",
+    e => {
+        e.preventDefault();
+    },
+    { passive: false }
+);
+
+</script>
+
+</body>
+</html>
